@@ -1,14 +1,11 @@
 # mime-types
 
-<!-- [![NPM Version][npm-version-image]][npm-url]
+[![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][npm-url]
-[![Node.js Version][node-version-image]][node-version-url]
-[![Build Status][ci-image]][ci-url]
-[![Test Coverage][coveralls-image]][coveralls-url] -->
 
 The ultimate javascript content-type utility.
 
-Forked from [mime-types](https://github.com/jshttp/mime-types)
+Forked from [mime-types][fork-url]
 
 - Written in typescript
 - Created MimeTypes Class
@@ -23,7 +20,6 @@ Forked from [mime-types](https://github.com/jshttp/mime-types)
 
 - New Function
   - [getMimes](#getmimes)
-- Exposed Properties
 
 ## Adding Types
 
@@ -32,14 +28,16 @@ so open a PR there if you'd like to add mime types.
 
 ## API
 
-- Installation
-- Getting Started
+- [Installation](#installation)
+- [Getting Started](#getting-started)
   - [CJS](#cjs)
-- Properties
+  - [ESM](#ESM)
+  - [Others](#others)
+- [Properties](#properties)
   - [types](#types)
   - [typeSets](#typesets)
   - [extensions](#extensions)
-- Methods
+- [Methods](#methods)
   - [getMime](#getmime)
   - [getMimes](#getmimes)
   - [getContentType](#getcontenttype)
@@ -47,6 +45,16 @@ so open a PR there if you'd like to add mime types.
   - [getCharset](#getcharset)
 
 ## Getting Started
+
+### Installation
+
+```sh
+$ npm i @whykhamist/mime-types
+
+or
+
+$ yarn add @whykhamist/mime-types
+```
 
 ### CJS
 
@@ -93,6 +101,24 @@ import { MimeDatabase } from "mime-db";
 
 const mime = new MimeTypes(db as MimeDatabase);
 ```
+
+### extname
+
+> By default, the class uses regex to extract the file extension from a path string. If you want to use other function for the extraction **(ex. Node.js path.extname)**, then create a new `MimeTypes` instance and add the function as a second paramenter
+
+```js
+import { extname } from "path";
+const mime = new MimeTypes(db, extname);
+```
+
+> Make sure that the function takes a string (path) and returns the file extension. Must return any falsy value if no extension could be identified.
+
+#### Regex used
+
+```js
+/^.+\.([^.]+)$/
+```
+
 <!-- prettier-ignore-end -->
 
 ## Properties
@@ -190,12 +216,7 @@ getCharset("text/markdown"); // 'UTF-8'
 
 [MIT](LICENSE)
 
-<!-- [ci-image]: https://badgen.net/github/checks/jshttp/mime-types/master?label=ci
-[ci-url]: https://github.com/jshttp/mime-types/actions/workflows/ci.yml
-[coveralls-image]: https://badgen.net/coveralls/c/github/jshttp/mime-types/master
-[coveralls-url]: https://coveralls.io/r/jshttp/mime-types?branch=master
-[node-version-image]: https://badgen.net/npm/node/mime-types
-[node-version-url]: https://nodejs.org/en/download
-[npm-downloads-image]: https://badgen.net/npm/dm/mime-types
-[npm-url]: https://npmjs.org/package/mime-types
-[npm-version-image]: https://badgen.net/npm/v/mime-types -->
+[npm-downloads-image]: https://badgen.net/npm/dm/@whykhamist/mime-types
+[npm-url]: https://www.npmjs.com/package/@whykhamist/mime-types
+[npm-version-image]: https://badgen.net/npm/v/@whykhamist/mime-types
+[fork-url]: https://github.com/jshttp/mime-types
