@@ -1,4 +1,5 @@
-import type { MimeDatabase, MimeEntry, IExtNameFn, IMimeTypes } from "./types";
+import type { MimeDatabase, MimeEntry } from "mime-db";
+import type { IExtNameFn, IMimeTypes } from "./types";
 
 class MimeTypes implements IMimeTypes {
   private db: MimeDatabase;

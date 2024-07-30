@@ -1,8 +1,6 @@
-import type { MimeDatabase, MimeEntry, MimeSource } from "mime-db";
+export type IExtNameFn = (path: string) => string;
 
-type IExtNameFn = (path: string) => string;
-
-interface IMimeTypes {
+export interface IMimeTypes {
   types: Record<string, string>;
   extensions: Record<string, Array<string>>;
   typeSets: Record<string, Array<string>>;
@@ -13,5 +11,3 @@ interface IMimeTypes {
   getMime(type: string): boolean | string;
   getMimes(type: string): boolean | Array<string>;
 }
-
-export type { MimeDatabase, MimeEntry, MimeSource, IExtNameFn, IMimeTypes };

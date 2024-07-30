@@ -1,8 +1,7 @@
-import { MimeDatabase } from "mime-db";
 import MimeTypes from "./mime-types";
-import db from "mime-db/db.json";
+import MimeDb from "mime-db";
+import instance from "./instance";
 
-const instance = new MimeTypes(db as MimeDatabase);
 const {
   types,
   extensions,
@@ -16,7 +15,7 @@ const {
 } = instance;
 export {
   MimeTypes,
-  db as MimeDb,
+  MimeDb,
   types,
   extensions,
   typeSets,
@@ -26,4 +25,6 @@ export {
   getMime,
   getMimes,
 };
+
+export * from "./types";
 export default instance;
