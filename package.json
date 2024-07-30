@@ -19,10 +19,10 @@
   "module": "./dist/index",
   "types": "./dist/types/index.d.ts",
   "files": [
-    "HISTORY.md",
-    "LICENSE",
     "dist",
-    "src"
+    "src",
+    "HISTORY.md",
+    "LICENSE"
   ],
   "exports": {
     ".": {
@@ -37,7 +37,7 @@
     "build:lib": "vite build",
     "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
     "lint": "eslint src/**/*.ts",
-    "test": "npm run build && mocha --reporter spec test/*.spec.{ts,cjs}",
+    "test": "npm run build && npm run test:no-build",
     "test:no-build": "mocha --reporter spec test/*.spec.{ts,cjs}"
   },
   "devDependencies": {
