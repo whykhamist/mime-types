@@ -1,7 +1,6 @@
 {
   "name": "@whykhamist/mime-types",
   "description": "The ultimate javascript content-type utility.",
-  "private": true,
   "version": "1.0.0",
   "contributors": [
     "Jhyden Jhoe Marx Ellana <https://github.com/whykhamist>",
