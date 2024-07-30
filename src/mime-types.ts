@@ -5,6 +5,7 @@ class MimeTypes implements IMimeTypes {
   private db: MimeDatabase;
   private EXTRACT_TYPE_REGEXP: RegExp;
   private TEXT_TYPE_REGEXP: RegExp;
+  private EXTRACT_EXT_REGEXP: RegExp;
   types: Record<string, string>;
   extensions: Record<string, Array<string>>;
   typeSets: Record<string, Array<string>>;
@@ -17,6 +18,7 @@ class MimeTypes implements IMimeTypes {
 
     this.EXTRACT_TYPE_REGEXP = /^\s*([^;\s]*)(?:;|\s|$)/;
     this.TEXT_TYPE_REGEXP = /^text\//i;
+    this.EXTRACT_EXT_REGEXP = /^.+\.([^.]+)$/;
 
     this.types = Object.create(null);
     this.extensions = Object.create(null);
@@ -36,7 +38,7 @@ class MimeTypes implements IMimeTypes {
     //   return `.${ext[ext.length - 1]}`;
     // }
     // return "";
-    const ext = /^.+\.([^.]+)$/.exec(path);
+    const ext = this.EXTRACT_EXT_REGEXP.exec(path);
     return ext == null ? "" : `.${ext[1]}`;
   };
 
