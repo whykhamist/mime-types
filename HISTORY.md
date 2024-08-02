@@ -1,4 +1,4 @@
-# 1.0.2 / 2024-07-xx
+# 1.0.2 / 2024-08-02
 
     - Readme update
     - Updated import and exports
