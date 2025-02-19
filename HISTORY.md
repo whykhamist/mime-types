@@ -1,3 +1,8 @@
+# 1.0.3 / 2025-02-19
+
+    - Upgrade dependencies
+    - Update package.json (Resolve build warnings)
+
 # 1.0.2 / 2024-08-02
 
     - Readme update
