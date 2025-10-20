@@ -1,3 +1,7 @@
+# 1.0.4 / 2025-10-20
+
+    - Upgrade dependencies
+
 # 1.0.3 / 2025-02-19
 
     - Upgrade dependencies

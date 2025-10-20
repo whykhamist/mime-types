@@ -1,7 +1,7 @@
 {
   "name": "@whykhamist/mime-types",
   "description": "The ultimate javascript content-type utility.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "contributors": [
     "Jhyden Jhoe Marx Ellana <https://github.com/whykhamist>",
     "Douglas Christopher Wilson <doug@somethingdoug.com>",
@@ -41,22 +41,21 @@
     "test:no-build": "mocha --reporter spec test/*.spec.{ts,cjs}"
   },
   "devDependencies": {
-    "@eslint/js": "^9.20.0",
-    "@types/chai": "^5.0.1",
-    "@types/eslint__js": "^8.42.3",
-    "@types/mime-db": "^1.43.5",
+    "@eslint/js": "^9.38.0",
+    "@types/chai": "^5.2.2",
+    "@types/mime-db": "^1.43.6",
     "@types/mocha": "^10.0.10",
-    "chai": "^5.2.0",
-    "eslint": "^9.20.1",
-    "mocha": "^11.1.0",
-    "prettier": "^3.5.1",
-    "tsx": "^4.19.3",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.1",
-    "vite": "^6.1.0",
-    "vue-tsc": "^2.2.2"
+    "chai": "^6.2.0",
+    "eslint": "^9.38.0",
+    "mocha": "^11.7.4",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.1",
+    "vite": "^7.1.10",
+    "vue-tsc": "^3.1.1"
   },
   "dependencies": {
-    "mime-db": "^1.53.0"
+    "mime-db": "^1.54.0"
   }
 }
