@@ -1,5 +1,6 @@
 import type { MimeDatabase, MimeEntry } from "mime-db";
 import type { IExtNameFn, IMimeTypes } from "./types";
+import { mimeScore } from "./mimeScore";
 
 class MimeTypes implements IMimeTypes {
   private db: MimeDatabase;
@@ -9,6 +10,7 @@ class MimeTypes implements IMimeTypes {
   types: Record<string, string>;
   extensions: Record<string, Array<string>>;
   typeSets: Record<string, Array<string>>;
+  // _extensionConflicts: Array<Array<string>> = [];
 
   constructor(db: MimeDatabase, extNameFn?: IExtNameFn) {
     this.db = db;
@@ -81,9 +83,6 @@ class MimeTypes implements IMimeTypes {
    * @private
    */
   private populateMaps = () => {
-    // source preference (least -> most)
-    const preference = ["nginx", "apache", undefined, "iana"];
-
     const db: MimeDatabase = this.db;
     const types = this.types;
     const typeSets = this.typeSets;
@@ -107,26 +106,55 @@ class MimeTypes implements IMimeTypes {
         } else {
           typeSets[exts[i]] = [type];
         }
+        types[extension] = this._preferredType(
+          extension,
+          types[extension],
+          type
+        );
 
-        if (types[extension]) {
-          const from = preference.indexOf(db[types[extension]].source);
-          const to = preference.indexOf(mime.source);
-
-          if (
-            types[extension] !== "application/octet-stream" &&
-            (from > to ||
-              (from === to &&
-                types[extension].substr(0, 12) === "application/"))
-          ) {
-            // skip the remapping
-            continue;
-          }
-        }
-
-        // set the extension -> mime
-        types[extension] = type;
+        // DELETE (eventually): Capture extension->type maps that change as a
+        // result of switching to mime-score.  This is just to help make reviewing
+        // PR #119 (https://github.com/jshttp/mime-types/pull/119) easier, and can be removed once that PR is approved.
+        // const legacyType = this._preferredTypeLegacy(
+        //   extension,
+        //   types[extension],
+        //   type
+        // );
+        // if (legacyType !== types[extension]) {
+        //   this._extensionConflicts.push([
+        //     extension,
+        //     legacyType,
+        //     types[extension],
+        //   ]);
+        // }
       }
     });
+  };
+
+  // Resolve type conflict using mime-score
+  _preferredType = (ext: string, type0: string, type1: string) => {
+    const score0 = type0 ? mimeScore(type0, this.db[type0].source) : 0;
+    const score1 = type1 ? mimeScore(type1, this.db[type1].source) : 0;
+
+    return score0 > score1 ? type0 : type1;
+  };
+
+  // Resolve type conflict using pre-mime-score logic
+  _preferredTypeLegacy = (ext: string, type0: string, type1: string) => {
+    const SOURCE_RANK = ["nginx", "apache", undefined, "iana"];
+
+    const score0 = type0 ? SOURCE_RANK.indexOf(this.db[type0].source) : 0;
+    const score1 = type1 ? SOURCE_RANK.indexOf(this.db[type1].source) : 0;
+
+    if (
+      this.types[ext] !== "application/octet-stream" &&
+      (score0 > score1 ||
+        (score0 === score1 && this.types[ext]?.slice(0, 12) === "application/"))
+    ) {
+      return type0;
+    }
+
+    return score0 > score1 ? type0 : type1;
   };
 
   /**
