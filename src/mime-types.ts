@@ -1,16 +1,15 @@
 import type { MimeDatabase, MimeEntry } from "mime-db";
 import type { IExtNameFn, IMimeTypes } from "./types";
-import { mimeScore } from "./mimeScore";
+import { mimeScore, mimeExtensionScore } from "./scores";
 
 class MimeTypes implements IMimeTypes {
   private db: MimeDatabase;
-  private EXTRACT_TYPE_REGEXP: RegExp;
-  private TEXT_TYPE_REGEXP: RegExp;
-  private EXTRACT_EXT_REGEXP: RegExp;
-  types: Record<string, string>;
-  extensions: Record<string, Array<string>>;
-  typeSets: Record<string, Array<string>>;
-  // _extensionConflicts: Array<Array<string>> = [];
+  private EXTRACT_TYPE_REGEXP: RegExp = /^\s*([^;\s]*)(?:;|\s|$)/;
+  private TEXT_TYPE_REGEXP: RegExp = /^text\//i;
+  private EXTRACT_EXT_REGEXP: RegExp = /^.+\.([^.]+)$/;
+  types: Record<string, string> = Object.create(null);
+  extensions: Record<string, Array<string>> = Object.create(null);
+  typeSets: Record<string, Array<string>> = Object.create(null);
 
   constructor(db: MimeDatabase, extNameFn?: IExtNameFn) {
     this.db = db;
@@ -18,13 +17,6 @@ class MimeTypes implements IMimeTypes {
       this.setExtNameFn(extNameFn);
     }
 
-    this.EXTRACT_TYPE_REGEXP = /^\s*([^;\s]*)(?:;|\s|$)/;
-    this.TEXT_TYPE_REGEXP = /^text\//i;
-    this.EXTRACT_EXT_REGEXP = /^.+\.([^.]+)$/;
-
-    this.types = Object.create(null);
-    this.extensions = Object.create(null);
-    this.typeSets = Object.create(null);
     this.populateMaps();
   }
 
@@ -35,11 +27,6 @@ class MimeTypes implements IMimeTypes {
    * @returns {string} string  extension or empty string if not found
    */
   private extname = (path: string): string => {
-    // let ext = path.split(".");
-    // if (!!ext[ext.length - 2]) {
-    //   return `.${ext[ext.length - 1]}`;
-    // }
-    // return "";
     const ext = this.EXTRACT_EXT_REGEXP.exec(path);
     return ext == null ? "" : `.${ext[1]}`;
   };
@@ -106,55 +93,29 @@ class MimeTypes implements IMimeTypes {
         } else {
           typeSets[exts[i]] = [type];
         }
-        types[extension] = this._preferredType(
-          extension,
-          types[extension],
-          type
-        );
 
-        // DELETE (eventually): Capture extension->type maps that change as a
-        // result of switching to mime-score.  This is just to help make reviewing
-        // PR #119 (https://github.com/jshttp/mime-types/pull/119) easier, and can be removed once that PR is approved.
-        // const legacyType = this._preferredTypeLegacy(
-        //   extension,
-        //   types[extension],
-        //   type
-        // );
-        // if (legacyType !== types[extension]) {
-        //   this._extensionConflicts.push([
-        //     extension,
-        //     legacyType,
-        //     types[extension],
-        //   ]);
-        // }
+        typeSets[exts[i]].sort(
+          (a, b) => mimeScore(b, db[b].source) - mimeScore(a, db[a].source)
+        );
+        types[extension] = this._preferredType(types[extension], type);
       }
     });
   };
 
   // Resolve type conflict using mime-score
-  _preferredType = (ext: string, type0: string, type1: string) => {
+  _preferredType = (type0: string, type1: string) => {
     const score0 = type0 ? mimeScore(type0, this.db[type0].source) : 0;
     const score1 = type1 ? mimeScore(type1, this.db[type1].source) : 0;
 
     return score0 > score1 ? type0 : type1;
   };
 
-  // Resolve type conflict using pre-mime-score logic
-  _preferredTypeLegacy = (ext: string, type0: string, type1: string) => {
-    const SOURCE_RANK = ["nginx", "apache", undefined, "iana"];
-
-    const score0 = type0 ? SOURCE_RANK.indexOf(this.db[type0].source) : 0;
-    const score1 = type1 ? SOURCE_RANK.indexOf(this.db[type1].source) : 0;
-
-    if (
-      this.types[ext] !== "application/octet-stream" &&
-      (score0 > score1 ||
-        (score0 === score1 && this.types[ext]?.slice(0, 12) === "application/"))
-    ) {
-      return type0;
-    }
-
-    return score0 > score1 ? type0 : type1;
+  _extScore = (ext: string): number => {
+    return mimeExtensionScore(
+      this.types[ext],
+      ext,
+      this.db[this.types[ext]].source
+    );
   };
 
   /**
@@ -219,21 +180,66 @@ class MimeTypes implements IMimeTypes {
    * @return {boolean|string}
    */
   getExtension = (type: string): boolean | string => {
-    if (!type || typeof type !== "string") {
-      return false;
+    const exts = this.getExtensions(type);
+    return exts.length ? exts[0] : false;
+  };
+
+  /**
+   * Return all extensions for a given MIME type.
+   * Supports wildcard types such as "image/*".
+   *
+   * @param mimeType The full mime string (e.g. "image/png" or "image/*")
+   * @returns string[] Array of extensions (no leading dot). Empty array if none.
+   */
+  getExtensions = (mimeType: string | Array<string>): string[] => {
+    const { types, extensions } = this;
+
+    // If array input, merge all results (deduped)
+    if (Array.isArray(mimeType)) {
+      const set = new Set<string>();
+      for (const mt of mimeType) {
+        for (const ext of this.getExtensions(mt)) {
+          set.add(ext);
+        }
+      }
+      return Array.from(set).sort(
+        (a, b) => this._extScore(b) - this._extScore(a)
+      );
     }
 
-    // TODO: use media-typer
-    const match = this.EXTRACT_TYPE_REGEXP.exec(type);
-
-    // get extensions
-    const exts = match && this.extensions[match[1].toLowerCase()];
-
-    if (!exts || !exts.length) {
-      return false;
+    // Sanity check
+    if (!mimeType || typeof mimeType !== "string") {
+      return [];
     }
 
-    return exts[0];
+    let type = mimeType.trim().toLowerCase();
+    type = type.split(";")[0].trim();
+
+    const exact = extensions[type];
+    if (Array.isArray(exact) && exact.length > 0) {
+      return [...exact].sort((a, b) => this._extScore(b) - this._extScore(a));
+    }
+
+    if (!type.includes("*")) {
+      return [];
+    }
+
+    const escapeRE = (s: string) => s.replace(/[.+?^${}()|[\]\\]/g, "\\$&"); // escape regex specials
+
+    const pattern = "^" + escapeRE(type).replace("*", "[^/]*") + "$";
+    const re = new RegExp(pattern);
+
+    // Iterate 'types' map. In this repo 'types' maps ext -> mime (string or array)
+    const results: string[] = [];
+    for (const [ext, mimeValue] of Object.entries(types)) {
+      if (!mimeValue) continue;
+
+      if (re.test(mimeValue)) results.push(ext);
+    }
+
+    return Array.from(new Set(results)).sort(
+      (a, b) => this._extScore(b) - this._extScore(a)
+    );
   };
 
   /**
