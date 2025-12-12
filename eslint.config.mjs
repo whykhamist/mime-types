@@ -1,12 +1,10 @@
-// @ts-check
+import eslint from "@eslint/js";
+import { defineConfig } from "eslint/config";
+import tseslint from "typescript-eslint";
+import mochaPlugin from "eslint-plugin-mocha";
 
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-
-export default tseslint.config(
+export default defineConfig([
   eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  {
-    ignores: ["node_modules/", "dist/"],
-  }
-);
+  tseslint.configs.recommended,
+  mochaPlugin.configs.recommended,
+]);
