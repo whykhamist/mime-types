@@ -1,36 +1,22 @@
-// 'mime-score' back-ported to CommonJS
+import { FACET_SCORES, SOURCE_SCORES, TYPE_SCORES } from "./scoreTable";
 
-// Score RFC facets (see https://tools.ietf.org/html/rfc6838#section-3)
-const FACET_SCORES: Record<string, number> = {
-  "prs.": 100,
-  "x-": 200,
-  "x.": 300,
-  "vnd.": 400,
-  default: 900,
-};
+/**
+ * Safely extracts the RFC 6838 "facet" of a subtype.
+ * Returns a string ending in '.' or '-' that represents the facet prefix.
+ *
+ * Examples:
+ *  'vnd.ms-excel' → 'vnd.'
+ *  'x-ms-bmp' → 'x-'
+ *  'prs.mytype' → 'prs.'
+ *  'json' → ''
+ */
+const extractFacet = (subtype: string): string => {
+  if (!subtype || typeof subtype !== "string") return "";
 
-// Score mime source (Logic originally from `jshttp/mime-types` module)
-const SOURCE_SCORES: Record<string, number> = {
-  nginx: 10,
-  apache: 20,
-  iana: 40,
-  default: 30, // definitions added by `jshttp/mime-db` project?
-};
-
-const TYPE_SCORES: Record<string, number> = {
-  // prefer application/xml over text/xml
-  // prefer application/rtf over text/rtf
-  application: 1,
-
-  // prefer font/woff over application/font-woff
-  font: 2,
-
-  // prefer video/mp4 over audio/mp4 over application/mp4
-  // See https://www.rfc-editor.org/rfc/rfc4337.html#section-2
-  audio: 2,
-  video: 3,
-
-  default: 0,
+  // RFC facets start with: vnd., prs., x- , x.
+  // Find the earliest valid facet prefix.
+  const facetMatch = subtype.match(/^(vnd\.|prs\.|x-|x\.)/);
+  return facetMatch ? facetMatch[1] : "";
 };
 
 /**
@@ -42,13 +28,20 @@ export const mimeScore = (mimeType: string, source: string = "default") => {
     return 0;
   }
 
-  const [type, subtype] = mimeType.split("/");
+  const parts = mimeType.split("/");
 
-  const facet = subtype.replace(/(\.|x-).*/, "$1");
+  if (parts.length !== 2) {
+    // Invalid mime type; score it lowest to avoid being selected accidentally
+    return 0;
+  }
 
-  const facetScore = FACET_SCORES[facet] || FACET_SCORES.default;
-  const sourceScore = SOURCE_SCORES[source] || SOURCE_SCORES.default;
-  const typeScore = TYPE_SCORES[type] || TYPE_SCORES.default;
+  const [type, subtype] = parts;
+
+  const facet = extractFacet(subtype);
+
+  const facetScore = FACET_SCORES[facet] ?? FACET_SCORES.default;
+  const sourceScore = SOURCE_SCORES[source] ?? SOURCE_SCORES.default;
+  const typeScore = TYPE_SCORES[type] ?? TYPE_SCORES.default;
 
   // All else being equal prefer shorter types
   const lengthScore = 1 - mimeType.length / 100;
