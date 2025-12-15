@@ -1,3 +1,15 @@
+# 1.1.0 / 2025-12-15
+
+    - Upgrade dependencies
+    - Integrate jshttp/mime-types#119
+        - Resolves extension conflicts with mime-score
+        - Improved facet prefix extraction
+    - Improve extension lookup using wild card mime types
+    - Add the `getExtensions(...)` function that lists all possible extensions for mime types
+    - Add extension scoring (similar to `mime-score`) to determine the best extension for a mime-type
+    - Move score tables to a separate module
+    - Update unit tests
+
 # 1.0.4 / 2025-10-20
 
     - Upgrade dependencies
