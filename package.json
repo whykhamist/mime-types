@@ -1,7 +1,7 @@
 {
   "name": "@whykhamist/mime-types",
   "description": "The ultimate javascript content-type utility.",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "contributors": [
     "Jhyden Jhoe Marx Ellana <https://github.com/whykhamist>",
     "Douglas Christopher Wilson <doug@somethingdoug.com>",
@@ -41,12 +41,13 @@
     "test:no-build": "mocha --reporter spec test/*.spec.{ts,cjs}"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^9.39.2",
     "@types/chai": "^5.2.3",
     "@types/mime-db": "^1.43.6",
     "@types/mocha": "^10.0.10",
     "chai": "^6.2.1",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
+    "eslint-plugin-mocha": "^11.2.0",
     "mocha": "^11.7.5",
     "prettier": "^3.7.4",
     "tsx": "^4.21.0",

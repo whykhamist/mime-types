@@ -8,6 +8,7 @@ export interface IMimeTypes {
   getCharset(str: string): boolean | string;
   getContentType(str: string): boolean | string;
   getExtension(type: string): boolean | string;
+  getExtensions(type: string): Array<string>;
   getMime(type: string): boolean | string;
   getMimes(type: string): boolean | Array<string>;
 }

@@ -10,6 +10,7 @@ const {
   getCharset,
   getContentType,
   getExtension,
+  getExtensions,
   getMime,
   getMimes,
 } = instance;
@@ -22,6 +23,7 @@ export {
   getCharset,
   getContentType,
   getExtension,
+  getExtensions,
   getMime,
   getMimes,
 };
