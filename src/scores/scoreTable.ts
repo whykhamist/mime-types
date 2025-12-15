@@ -54,6 +54,7 @@ export const EXTENSION_SCORES: Record<string, number> = {
   md: 820,
   html: 780,
   htm: 760,
+  shtml: 750,
   docx: 750,
   doc: 540,
   xlsx: 730,
