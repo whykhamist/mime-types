@@ -217,6 +217,58 @@ describe("MimeTypes CJS", function () {
       expect(exts.length).to.be.greaterThan(0);
     });
 
+    it("should support multiple wildcard mime types", function () {
+      const exts = MTypes.getExtensions("video/vnd.*.hd");
+      const deceVideoExts = MTypes.getExtensions("video/*.dece.*");
+      const deceImageExts = MTypes.getExtensions("image/*.dece.*");
+      const deceAudioExts = MTypes.getExtensions("audio/*.dece.*");
+      const deceAppExts = MTypes.getExtensions("application/*.dece.*");
+      const deceExts = MTypes.getExtensions("*/*.dece.*");
+
+      expect(exts).to.be.an("array");
+      expect(exts).to.include("uvh");
+      expect(exts).to.include("uvvh");
+      expect(exts.length).to.be.greaterThan(0);
+
+      const deceVideos = [
+        "uvh",
+        "uvp",
+        "uvs",
+        "uvv",
+        "uvm",
+        "uvvh",
+        "uvvp",
+        "uvvs",
+        "uvvv",
+        "uvvm",
+      ];
+      const deceImage = ["uvi", "uvg", "uvvi", "uvvg"];
+      const deceAudios = ["uva", "uvva"];
+      const deceApplication = [
+        "uvz",
+        "uvf",
+        "uvd",
+        "uvt",
+        "uvx",
+        "uvvz",
+        "uvvf",
+        "uvvd",
+        "uvvt",
+        "uvvx",
+      ];
+      const dece = [
+        ...deceVideos,
+        ...deceAudios,
+        ...deceApplication,
+        ...deceImage,
+      ];
+      assert.sameDeepMembers(deceVideoExts, deceVideos);
+      assert.sameDeepMembers(deceImageExts, deceImage);
+      assert.sameDeepMembers(deceAudioExts, deceAudios);
+      assert.sameDeepMembers(deceAppExts, deceApplication);
+      assert.sameDeepMembers(deceExts, dece);
+    });
+
     it("should normalize mime type (case + parameters)", function () {
       const exts = MTypes.getExtensions("IMAGE/JPEG; charset=utf-8");
       expect(exts).to.include("jpg");
