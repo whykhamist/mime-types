@@ -226,7 +226,7 @@ class MimeTypes implements IMimeTypes {
 
     const escapeRE = (s: string) => s.replace(/[.+?^${}()|[\]\\]/g, "\\$&"); // escape regex specials
 
-    const pattern = "^" + escapeRE(type).replace("*", "[^/]*") + "$";
+    const pattern = "^" + escapeRE(type).replace(/\*/g, "[^\\/]*") + "$";
     const re = new RegExp(pattern);
 
     // Iterate 'types' map. In this repo 'types' maps ext -> mime (string or array)
