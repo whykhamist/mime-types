@@ -1,3 +1,7 @@
+# 1.1.1 / 2025-12-16
+    - Updated the regex pattern to correctly handle multiple wildcards in MIME type matching by replacing all '*' characters with the appropriate regex expression.
+    - Update Readme.md
+
 # 1.1.0 / 2025-12-15
 
     - Upgrade dependencies
