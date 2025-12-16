@@ -18,9 +18,6 @@ Forked from [mime-types][fork-url]
   | extension   | [getExtension](#getextension)     |
   | charset     | [getCharset](#getcharset)         |
 
-- New Function
-  - [getMimes](#getmimes)
-
 ## Adding Types
 
 All mime types are based on [mime-db](https://www.npmjs.com/package/mime-db),
@@ -42,6 +39,7 @@ so open a PR there if you'd like to add mime types.
   - [getMimes](#getmimes)
   - [getContentType](#getcontenttype)
   - [getExtension](#getextension)
+  - **New:** [getExtensions](#getextensions)
   - [getCharset](#getcharset)
 
 ## Getting Started
@@ -202,6 +200,49 @@ Get the default extension for a content-type.
 
 ```js
 getExtension("application/octet-stream"); // 'bin'
+
+// Using wildcards
+getExtension("image/*"); // jpg
+```
+
+### getExtensions
+
+Get all extensions for a content-type.
+
+```js
+getExtensions("application/octet-stream"); // [ 'bin' ]
+
+// Using wildcards
+getExtensions("text/html"); // [ 'html', 'htm', 'shtml' ]
+getExtensions("image/jpeg"); // [ 'jpg', 'jpeg', 'jpe' ]
+getExtensions("video/*"); /** [
+  'mp4',   'ts',   'webm', 'qt',   'mj2',  'ogv',
+  'mts',   '3gp',  'm2t',  'mpg',  'mpe',  'm1v',
+  'm2v',   '3g2',  'm4s',  'mpg4', 'mjp2', 'mp4v',
+  '3gpp',  'h261', 'h263', 'h264', 'jpgv', 'm2ts',
+  'mpeg',  'mov',  'fvt',  'viv',  'uvh',  'uvp',
+  'uvs',   'mxu',  'm4u',  'dvb',  'uvu',  'uvv',
+  'uvm',   'pyv',  'uvvh', 'uvvp', 'uvvs', 'uvvu',
+  'uvvv',  'uvvm', 'm4v',  'mkv',  'wm',   'f4v',
+  'fli',   'flv',  'mng',  'smv',  'asf',  'asx',
+  'vob',   'wmv',  'wmx',  'wvx',  'mks',  'mk3d',
+  'movie', 'avi'
+]*/
+
+getExtensions("*/*zip");
+/**
+zip => application/zip
+gz => application/gzip
+amlx => application/automationml-amlx+zip
+epub => application/epub+zip
+stpz => model/step+zip
+stpxz => model/step-xml+zip
+uvz => application/vnd.dece.zip
+uvvz => application/vnd.dece.zip
+air => application/vnd.adobe.air-application-installer-package+zip
+usdz => model/vnd.usdz+zip
+bz => application/x-bzip
+ */
 ```
 
 ### getCharset
