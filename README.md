@@ -228,6 +228,21 @@ getExtensions("video/*"); /** [
   'vob',   'wmv',  'wmx',  'wvx',  'mks',  'mk3d',
   'movie', 'avi'
 ]*/
+
+getExtensions("*/*zip");
+/**
+zip => application/zip
+gz => application/gzip
+amlx => application/automationml-amlx+zip
+epub => application/epub+zip
+stpz => model/step+zip
+stpxz => model/step-xml+zip
+uvz => application/vnd.dece.zip
+uvvz => application/vnd.dece.zip
+air => application/vnd.adobe.air-application-installer-package+zip
+usdz => model/vnd.usdz+zip
+bz => application/x-bzip
+ */
 ```
 
 ### getCharset
